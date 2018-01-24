@@ -2,20 +2,25 @@
 #include <stdio.h>
 
 int i = 0;
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 // Note the return type: void*
 void* incrementingThreadFunction(){
     for (int j = 0; j < 1000000; j++) {
-	// TODO: sync access to i
-	i++;
+        // TODO: sync access to i
+        pthread_mutex_lock(&lock);
+        i++;
+        pthread_mutex_unlock(&lock);
     }
     return NULL;
 }
 
 void* decrementingThreadFunction(){
     for (int j = 0; j < 1000000; j++) {
-	// TODO: sync access to i
-	i--;
+        // TODO: sync access to i
+        pthread_mutex_lock(&lock);
+        i--;
+        pthread_mutex_unlock(&lock);
     }
     return NULL;
 }
@@ -31,5 +36,8 @@ int main(){
     pthread_join(decrementingThread, NULL);
     
     printf("The magic number is: %d\n", i);
+    
+    pthread_mutex_destroy(&lock);
+    
     return 0;
 }
